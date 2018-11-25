@@ -53,7 +53,7 @@ export default {
     box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
     background-color: white;
     width: 18%;
-    height: 50px;
+    height: 100px;
     text-decoration: none;
     &:active {
       transform: translateY(1px);
