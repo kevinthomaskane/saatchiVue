@@ -17,7 +17,7 @@ export default {
     }
   },
   mounted() {
-    chrome.bookmarks.getSubTree('0', function(data) {
+    chrome.bookmarks.getSubTree('0', data => {
       this.bookmarksArray = data[0].children[0].children
     })
   },
