@@ -1,6 +1,6 @@
 <template>
   <div id="app" v-if="vimg" :style="'background-image: url(' + vimg.image_url +')'">
-    <searchBar/>
+    <searchBar v-if="vsearchSetting"/>
     <clock />
     <a class="saatchi-logo" href="https://www.saatchiart.com">
       <img src="./assets/sa-white.png" alt="saatchi logo">
@@ -11,9 +11,18 @@
     <div class="notes">
       <note v-if="vnotes.length > 0" v-for="(item, index) of vnotes" :currentNote="item" @saveNote="saveNote" @deleteNote="deleteNote" :key="index"/>
     </div>
-    <card v-if="vimg" :image="vimg"/>
+    <card v-if="vimg && vartistSetting" :image="vimg"/>
     <settingsBtn :modalOpen="modalOpen" @openModal="openModal"/>
-    <modal :show="modalOpen" @closeModal="closeModal" />
+    <modal :show="modalOpen" 
+    :closeModal="closeModal" 
+    :addToDo="addToDo" 
+    :updateBg="updateBg" 
+    :todos="vtodos" 
+    :deleteToDo="deleteToDo" 
+    :artistSetting="vartistSetting"
+    :imageSetting="vimageSetting"
+    :searchSetting="vsearchSetting"
+    :handleSetting="handleSetting" />
   </div>
 </template>
 
@@ -40,51 +49,69 @@ export default {
   data() {
     return {
       vimg: {},
-      vartistSetting: false,
-      vimageSetting: false,
-      vsearchSetting: false,
-      todos: {},
+      vartistSetting: true,
+      vimageSetting: true,
+      vsearchSetting: true,
+      vtodos: [],
       vnotes: [],
       modalOpen: false
     }
   },
   mounted() {
-    this.renderComponents()
+    this.setStorage(this.$data)
+    this.renderBg()
   },
   methods: {
-    openModal(){
+    setStorage(obj) {
+      for (let prop in obj) {
+        if (localStorage.getItem(prop)) {
+          this.$data[prop] = JSON.parse(localStorage.getItem(prop))
+        } else {
+          localStorage.setItem(prop, JSON.stringify(obj[prop]))
+        }
+      }
+    },
+    renderBg() {
+      if (this.vimageSetting) {
+        const randomIndex = Math.floor(Math.random() * images.length)
+        this.vimg = images[randomIndex]
+        localStorage.setItem('vimg', JSON.stringify(this.vimg))
+      }
+    },
+    handleSetting(x, bool) {
+      if (x === 'image') {
+        localStorage.setItem('vimageSetting', JSON.stringify(bool))
+        this.vimageSetting = bool
+        return
+      }
+      if (x === 'artist') {
+        localStorage.setItem('vartistSetting', JSON.stringify(bool))
+        this.vartistSetting = bool
+        return
+      }
+      if (x === 'search') {
+        localStorage.setItem('vsearchSetting', JSON.stringify(bool))
+        this.vsearchSetting = bool
+      }
+    },
+    openModal() {
       this.modalOpen = true
     },
-    closeModal(){
+    closeModal() {
       this.modalOpen = false
     },
-    renderComponents() {
-      this.vimg = this.getBgImage()
-      this.vartistSetting = this.getArtistSetting()
-      this.vimageSetting = this.getImageSetting()
-      this.vsearchSetting = this.getSearchSetting()
-      this.vtodos = this.getTodos()
-      this.vnotes = this.getNotes()
+    updateBg(image) {
+      localStorage.setItem('vimg', JSON.stringify(image))
+      this.vimg = image
     },
-    getBgImage() {
-      const randomIndex = Math.floor(Math.random() * images.length)
-      this.vimg = images[randomIndex]
-      return this.setLocalStorage('vimg', this.vimg)
+    addToDo(content) {
+      this.vtodos.unshift({ id: Math.random(), content: content })
+      localStorage.setItem('vtodos', JSON.stringify(this.vtodos))
     },
-    getArtistSetting() {
-      return this.setLocalStorage('vartistSetting', false)
-    },
-    getImageSetting() {
-      return this.setLocalStorage('vimageSetting', false)
-    },
-    getSearchSetting() {
-      return this.setLocalStorage('vsearchSetting', false)
-    },
-    getTodos() {
-      return this.setLocalStorage('vtodos', {})
-    },
-    getNotes() {
-      return this.setLocalStorage('vnotes', [])
+    deleteToDo(item) {
+      const newArr = this.vtodos.filter(el => el.id != item)
+      localStorage.setItem('vtodos', JSON.stringify(newArr))
+      this.vtodos = newArr
     },
     createNote() {
       this.vnotes.unshift({ id: Math.random(), text: '' })
@@ -99,36 +126,9 @@ export default {
       }
     },
     deleteNote(note) {
-      const arr = this.vnotes.filter(el => {
-        return el.id !== note.id
-      })
+      const arr = this.vnotes.filter(el => el.id != note.id)
       localStorage.setItem('vnotes', JSON.stringify(arr))
       this.vnotes = arr
-    },
-    setLocalStorage(key, type) {
-      if (this.checkIfEmpty(JSON.parse(localStorage.getItem(key)))) {
-        localStorage.setItem(key, JSON.stringify(type))
-        return type
-      } else {
-        return JSON.parse(localStorage.getItem(key))
-      }
-    },
-    checkIfEmpty(n) {
-      if (n === null || n === undefined) {
-        return true
-      }
-      if (typeof n === 'boolean') {
-        return n
-      }
-      if (typeof n === 'object') {
-        if (Object.keys(n).length === 0) {
-          return true
-        }
-      }
-      if (n.length === 0) {
-        return true
-      }
-      return false
     }
   }
 }
