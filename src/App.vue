@@ -141,6 +141,23 @@ export default {
   padding: 0;
 }
 
+html {
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
+
+body {
+  position: relative;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  font-family: "Helvetica", sans-serif;
+}
+
 input,
 textarea {
   outline: none;

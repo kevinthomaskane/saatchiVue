@@ -11,7 +11,7 @@
             <div :class="[selectedTab === 'bookmarks' ? 'active' : '', 'boookmarks']" @click="selectedTab = 'bookmarks'">
                 Bookmarks
             </div>
-            <div class="settings" @click="selectedTab = 'settings'">
+            <div :class="[selectedTab === 'settings' ? 'active' : '', 'settings']" @click="selectedTab = 'settings'">
                 Settings
             </div>
             <div class="close" @click="closeModal()">
@@ -23,7 +23,7 @@
                 Choose a background
             </h5>
             <div class="row">
-                <div v-for="(image, index) of images" :key="index" @click="updateBg(image)" class="image" :data-info="JSON.stringify(image)" :style="'background-image: url(' + image.image_url + ')'">
+                <div v-for="(image, index) of images" :key="index" @click="setBg(image)" class="image" :data-info="JSON.stringify(image)" :style="'background-image: url(' + image.image_url + ')'">
                 </div>
             </div>
         </div>
@@ -98,7 +98,12 @@ export default {
       images: images
     }
   },
-  methods: {}
+  methods: {
+      setBg(image){
+          this.handleSetting('image', false)
+          this.updateBg(image)
+      }
+  }
 }
 </script>
 
@@ -130,6 +135,7 @@ export default {
       cursor: pointer;
       color: white;
       width: calc(100% / 5);
+      text-align: right;
     }
   }
   &.show {
@@ -143,6 +149,7 @@ export default {
       font-size: 20px;
       font-weight: 200;
       text-align: center;
+      padding: 30px;
     }
     .row {
       display: flex;

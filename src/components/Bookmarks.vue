@@ -17,9 +17,9 @@ export default {
     }
   },
   mounted() {
-    // chrome.bookmarks.getSubTree('0', function(data) {
-    //   this.bookmarksArray = data[0].children[0].children
-    // })
+    chrome.bookmarks.getSubTree('0', function(data) {
+      this.bookmarksArray = data[0].children[0].children
+    })
   },
   methods: {
     truncateTitle(title) {
